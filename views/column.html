@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/public/layui/css/layui.css">
+</head>
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+      {{include './common/header.html'}}
+      
+      {{include './common/side.html'}}
+      
+      <div class="layui-body">
+        <!-- 内容主体区域 -->
+      <div style="padding: 15px;">
+        <h2>栏目管理</h2>
+        <table class="layui-table" lay-size="sm">
+          <colgroup>
+            <col width="100">
+            <col width="100">
+            <!-- 不写宽度即平分剩余空间 -->
+            <col width="">
+            <col width="">
+            <col width="150">
+            <col>
+          </colgroup>
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>分类名称</th>
+              <th>排序</th>
+              <th>添加时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            
+
+          </tbody>
+        </table>
+        <button type="button" class="layui-btn add">
+          <i class="layui-icon">&#xe608;</i> 添加
+        </button>
+      </div>
+      
+      {{include './common/footer.html'}}
+    </div>
+    
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+<script src="/public/layui/layui.all.js"></script>
+<script src="/public/js/moment.js"></script>
+<script src="/public/js/util.js"></script>
+<script>
+
+  (function(){
+    $.ajax({
+      url:'/getTable',
+      dataType:'json'
+    }).then(res=>{
+      console.log(res)
+    dataStr(res)
+    })
+    
+  })()
+  function dataStr(data){
+    let dataStr = ``;
+      data.forEach((item,i)=>{
+        let {cat_id,name,sort,add_date} = item
+        console.log(cat_id,name,sort,add_date)
+        add_date = util.date_format(add_date,"YYYY-MM-DD")
+        dataStr += `<tr>
+              <td>${i + 1}</td>
+              <td>${name}</td>
+              <td>${sort}</td>
+              <td>${add_date}</td>
+              <td>
+                  <div class="layui-btn-group">
+                    <button title='编辑' cat_id='${cat_id}' type="button" class="layui-btn edit"><i class="layui-icon">&#xe642;</i></button>
+                    <button title='删除' cat_id='${cat_id}' type="button" class="layui-btn layui-btn-danger del"><i class="layui-icon">&#xe640;</i></button>
+                  </div>
+              </td>
+            </tr>`
+      })
+      $("#tbody").html(dataStr)
+  }
+  $("#tbody").on('click','.del',function(){
+    console.log('111')
+    let _this = $(this);
+    let cat_id = _this.attr('cat_id');
+    layer.confirm('确认删除吗？',{
+      btn:['确认','取消']
+    },function(){
+      $.ajax({
+        url:'/delData',
+        type:'post',
+        data:{cat_id},
+        dataType:'json'
+      }).then(res=>{
+        console.log(res)
+        let {code,message} = res
+        if(code===0){
+          _this.parents('tr').remove();
+          $.each($('#tbody tr').find('td:eq(0)'),(i,ele)=>{
+            $(ele).html(i+1)
+          })
+          layer.msg(message)
+        }
+      })
+    })
+  })
+
+  $(".add").on('click',function(){
+    location.href = '/addcolumn'
+  })
+  $('#tbody').on('click',".edit",function(){
+    let cat_id = $(this).attr('cat_id')
+    console.log(cat_id)
+    location.href = '/editcolumn?cat_id='+cat_id
+  })
+
+  //JavaScript代码区域
+layui.use(['element','layer'], function(){
+  var element = layui.element;
+  
+});
+</script>
+</html>

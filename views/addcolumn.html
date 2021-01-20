@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>layout 后台大布局 - Layui</title>
+  <link rel="stylesheet" href="/public/layui/css/layui.css">
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  
+  {{include './common/header.html'}}
+  
+  {{include './common/side.html'}}
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <form class="layui-form" action="" style="width: 400px;">
+        <div class="layui-form-item">
+          <label class="layui-form-label">分类名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="name" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">排序</label>
+          <div class="layui-input-inline">
+            <input type="number" name="sort" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">发布时间</label>
+            <div class="layui-input-inline">
+              <input type="text"  id="add_date" name="add_date" required lay-verify="required" placeholder="发布时间" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+        </div>
+      </form>
+  </div>
+  
+  {{include './common/footer.html'}}
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+<script src="/public/layui/layui.all.js"></script>
+
+<script>
+//JavaScript代码区域
+layui.use(['element','form','laydate'], function(){
+  var element = layui.element;
+  var form = layui.form;
+  var laydate = layui.laydate;
+  laydate.render({
+      elem:'#add_date',
+      type:'datetime'
+  })
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    // layer.msg(JSON.stringify(data.field));
+    console.log(data)
+    $(data.elem).addClass('layui-btn-disabled').text('loading...')
+    $.ajax({
+        type:'post',
+        url:'/addcolumn',
+        data:data.field
+    }).then(res=>{
+        $(data.elem).removeClass('layui-btn-disabled').text('立即提交')
+        console.log(res)
+        let {code,message} = res
+        if(code===0){
+            layer.msg(message)
+            location.href = '/column'
+        }else{
+            layer.msg(message)
+        }
+    })
+    return false;
+  });
+});
+</script>
+</body>
+</html>
