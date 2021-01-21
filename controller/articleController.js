@@ -74,4 +74,20 @@ let resJson = require('../tool/resJson')
              
        
     }
+    articleController.artData = async (req,res)=>{
+        console.log(req.query)
+        let {page,limit:pagesize} = req.query
+        console.log(page,pagesize)
+        let offset = (page-1)*pagesize
+        let sql = `select * from article limit ${offset},${pagesize}`;
+        let sql2 = `select count(*) as count from article;`
+        let promise1 = dataquery(sql)
+        let promise2 = dataquery(sql2)
+        let result = await Promise.all([promise1,promise2])
+        let data = result[0]
+        let count = result[1][0].count
+        let responseText = {code:0,count,data,msg:''}
+
+        res.json(responseText)
+    }
     module.exports = articleController

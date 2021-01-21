@@ -17,6 +17,7 @@ router.get('/article',(req,res)=>{
 router.get('/editcolumn',(req,res)=>{
     res.render('editcolumn.html')
 })
+router.get('/artData',articleController.artData)
 router.get('/getTable',articleController.getTable)
 router.post('/delData',articleController.delData )
 router.post('/addcolumn',articleController.addColumn)
