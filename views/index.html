@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>layout 后台大布局 - Layui</title>
-  <link rel="stylesheet" href="/public/layui/css/layui.css">
+  {{include './common/linkCss.html'}}
 </head>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
@@ -19,17 +19,8 @@
   
   {{include './common/footer.html'}}
 </div>
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-<script src="/public/layui/layui.all.js"></script>
-<script>
-    // $("#one").on('click',()=>{
-    //     $.ajax({
-    //         url:'/one',
-    //         type:'post',
-            
-    //     })
-    // })
-</script>
+{{include './common/srcJs.html'}}
+
 <script>
 //JavaScript代码区域
 layui.use('element', function(){

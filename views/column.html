@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="/public/layui/css/layui.css">
+   {{include './common/linkCss.html'}}
 </head>
 <body class="layui-layout-body">
     <div class="layui-layout layui-layout-admin">
@@ -49,10 +49,7 @@
     </div>
     
 </body>
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-<script src="/public/layui/layui.all.js"></script>
-<script src="/public/js/moment.js"></script>
-<script src="/public/js/util.js"></script>
+{{include './common/srcJs.html'}}
 <script>
 
   (function(){

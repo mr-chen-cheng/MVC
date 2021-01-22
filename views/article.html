@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="/public/layui/css/layui.css">
+    {{include './common/linkCss.html'}}
 </head>
 <body class="layui-layout-body">
     <div class="layui-layout layui-layout-admin">
@@ -17,8 +17,14 @@
       <div style="padding: 15px;">
         <h2>文章管理</h2>
         <table class="layui-hide" id="test" lay-filter="test"></table>
+        <div>
+          <button type="button" id="add"  class="layui-btn">
+              <i class="layui-icon">&#xe608;</i> 添加文章
+          </button>
+      </div>  
        </div>
        <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
       </script>
@@ -28,24 +34,22 @@
     </div>
     
 </body>
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-<script src="/public/layui/layui.all.js"></script>
-<script src="/public/js/moment.js"></script>
-<script src="/public/js/util.js"></script>
+{{include './common/srcJs.html'}}
 <script>
 
   
 //JavaScript代码区域
-layui.use(['element','layer','table','laydate'], function(){
+layui.use(['element','layer','table'], function(){
   var element = layui.element;
   var table = layui.table;
-  var laydate = layui.laydate
-  table.render({
+  let tableUI = table.render({
     elem: '#test'
     ,toolbar:'#toolbarDemo'
     ,title:'文章数据'
     ,url: '/artData' //数据接口
     ,page: true //开启分页
+    ,limit:5
+    ,limits:[5,10,15,20]
     ,defaultToolbar:['filter','exports','print',{
       title:'提示'
       ,layEvent:'LAYTABLE_TIPS'
@@ -58,9 +62,9 @@ layui.use(['element','layer','table','laydate'], function(){
       ,{field: 'content', title: '内容', width:120} 
       ,{field: 'cat_id', title: '所属分类', width: 100}
       ,{field: 'author', title: '作者', width: 100}
-      ,{field: 'cover', title: '图片', width: 120}
+      ,{field: 'Cover', title: '图片', width: 120}
       ,{field: 'status', title: '状态', width: 100, sort: true,templet : function(item){
-        console.log(item)
+        // console.log(item)
         let dataMap = {
           '2':'审核中',
           '1':'未发布',
@@ -68,10 +72,56 @@ layui.use(['element','layer','table','laydate'], function(){
         }
         return dataMap[item.status]
       }}
-      ,{field:'publish_date', title:'发布时间', width:200, sort: true}
-      ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:120}
+      ,{field:'publish_date', title:'发布时间', width:200, sort: true,templet(item){
+        let publish_date = item.publish_date
+        publish_date = util.date_format(publish_date,'YYYY-MM-DD')
+        console.log(publish_date)
+        return publish_date
+      }}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo',unresize:true}
     ]]
   });
+  // 監聽事件
+  table.on('tool(test)',function(obj){
+    let {data,event} = obj;
+    let {art_id} = data;
+    switch(event){
+      case 'del':
+        del(art_id)
+        break;
+      case 'edit' :
+        edit(art_id)
+        break;
+      case 'look':
+        look(art_id)
+        break;
+    }
+  })
+  function del(art_id){
+    layer.confirm('確認刪除',{btn:['是的','取消']},function(){
+      $.ajax({
+        type:'post',
+        url:'/delarticle',
+        data:{art_id},
+      }).then(res=>{
+        let {code,message}= res
+        layer.closeAll();
+        if(code===0){
+          tableUI.reload(); // 重載表格
+          layer.msg(message)
+        }
+      })
+    })
+  }
+  function edit(art_id){
+    location.href = '/editarticle?art_id='+art_id
+  }
+  function look(art_id){
+    
+  }
+  $('#add').on('click',()=>{
+    location.href = '/addarticle'
+  })
 });
 </script>
 </html>

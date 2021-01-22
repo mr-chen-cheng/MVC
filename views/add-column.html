@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>layout 后台大布局 - Layui</title>
-  <link rel="stylesheet" href="/public/layui/css/layui.css">
+  {{include './common/linkCss.html'}}
 </head>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
@@ -44,28 +44,9 @@
   
   {{include './common/footer.html'}}
 </div>
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-<script src="/public/layui/layui.all.js"></script>
-<script src="/public/js/moment.js"></script>
-<script src="/public/js/util.js"></script>
+{{include './common/srcJs.html'}}
+
 <script>
-    let url = location.href;
-    let reg = /cat_id=(.*)&?/
-    let [,cat_id] = [...reg.exec(url)];
-    console.log(cat_id)
-    $.ajax({
-        url:'/redactColumn?cat_id='+cat_id
-    }).then(res=>{
-        console.log(res)
-        let {code,name,sort,add_date,cat_id}=res;
-        console.log(code,name,sort,add_date);
-        add_date = util.date_format(add_date,'YYYY-MM-DD');
-        if(code===0){
-            $("input[name='name']").val(name);
-            $("input[name='sort']").val(sort);
-            $("input[name='add_date']").val(add_date);
-        }
-    })
 //JavaScript代码区域
 layui.use(['element','form','laydate'], function(){
   var element = layui.element;
@@ -79,15 +60,11 @@ layui.use(['element','form','laydate'], function(){
   form.on('submit(formDemo)', function(data){
     // layer.msg(JSON.stringify(data.field));
     console.log(data)
-     data = {
-        ...data.field,
-        cat_id
-    }
     $(data.elem).addClass('layui-btn-disabled').text('loading...')
     $.ajax({
         type:'post',
-        url:'/updataColumn',
-        data:data
+        url:'/addcolumn',
+        data:data.field
     }).then(res=>{
         $(data.elem).removeClass('layui-btn-disabled').text('立即提交')
         console.log(res)
