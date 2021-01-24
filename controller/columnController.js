@@ -72,14 +72,14 @@ let resJson = require('../tool/resJson')
                 res.json(resJson.error)
             }
              
-       
     }
     columnController.artData = async (req,res)=>{
         console.log(req.query)
         let {page,limit:pagesize} = req.query
         console.log(page,pagesize)
         let offset = (page-1)*pagesize
-        let sql = `select * from article limit ${offset},${pagesize}`;
+        let sql = `select t1.*,t2.name from article t1 left join category t2 on t1.cat_id = t2.cat_id
+        order by t1.art_id desc limit ${offset},${pagesize}`;
         let sql2 = `select count(*) as count from article;`
         let promise1 = dataquery(sql)
         let promise2 = dataquery(sql2)

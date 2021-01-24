@@ -1,6 +1,10 @@
  const express = require('express')
- const router = express.Router();
+// 得到一个路由器
+let router = express.Router();
 
+const multer = require('multer');
+// 定义上传的目录
+let upload = multer({ dest: 'uploads/' })
 let columnController = require('../controller/columnController')
 let articleController = require('../controller/articleController')
  router.get(/^\/$|^\/index$/,(req,res)=>{
@@ -24,6 +28,9 @@ router.get('/editarticle',(req,res)=>{
 router.get('/addarticle',(req,res)=>{
     res.render('add-article.html')
 })
+router.get('/getArticleData',articleController.getArticleData)
+router.post('/upload',upload.single('file'),articleController.upload)
+router.post('/passverify',articleController.passverify)
 router.get('/getcolumn',columnController.getcolumn)
 router.post('/delarticle',articleController.delarticle)
 router.post('/addArticle',articleController.addArticle)

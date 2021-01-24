@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     {{include './common/linkCss.html'}}
+    <link rel="stylesheet" href="/public/css/lightbox.css">
 </head>
 <body class="layui-layout-body">
     <div class="layui-layout layui-layout-admin">
@@ -35,13 +36,14 @@
     
 </body>
 {{include './common/srcJs.html'}}
+<script src="/public/js/lightbot.js"></script>
 <script>
-
   
 //JavaScript代码区域
-layui.use(['element','layer','table'], function(){
+layui.use(['element','layer','table','upload'], function(){
   var element = layui.element;
   var table = layui.table;
+  
   let tableUI = table.render({
     elem: '#test'
     ,toolbar:'#toolbarDemo'
@@ -57,18 +59,25 @@ layui.use(['element','layer','table'], function(){
     }]
     ,cols: [[ //表头
       {type:'checkbox', fixed: 'left'}
-      ,{field: 'art_id', title: 'ID', width:100}
+      ,{field: 'art_id', title: 'ID', width:100,hide:true}
       ,{field: 'title', title: '标题', width:120}
       ,{field: 'content', title: '内容', width:120} 
-      ,{field: 'cat_id', title: '所属分类', width: 100}
+      ,{field: 'name', title: '所属分类', width: 100}
       ,{field: 'author', title: '作者', width: 100}
-      ,{field: 'Cover', title: '图片', width: 120}
+      ,{field: 'Cover', title: '图片', width: 120
+      ,templet({Cover}){
+              let imgStr = `<a class="example-image-link" href="${Cover}" data-lightbox="example-1" data-title="我帅木">
+                        <img class="example-image" src="${Cover}" alt="暂无图片" />
+                    </a>`;
+              return imgStr;
+            }
+    }
       ,{field: 'status', title: '状态', width: 100, sort: true,templet : function(item){
         // console.log(item)
         let dataMap = {
-          '2':'审核中',
-          '1':'未发布',
-          '0':'已发布'
+          '2':'<span class="layui-badge layui-bg-blue">审核中</span>',
+          '1':'<span class="layui-badge layui-bg-green">已发布</span>',
+          '0':'<span class="layui-badge layui-bg-red">未发布</span>'
         }
         return dataMap[item.status]
       }}
@@ -78,13 +87,29 @@ layui.use(['element','layer','table'], function(){
         console.log(publish_date)
         return publish_date
       }}
-      ,{fixed: 'right', title:'操作', toolbar: '#barDemo',unresize:true}
+      ,{fixed: 'right', title:'操作',unresize:true,
+      templet({status}){
+        console.log(status)
+        let  temStr =  `<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                  <a class="layui-btn layui-btn-xs" lay-event="look">查看内容</a>`;
+        switch(status){
+          case 0 :
+            temStr += `<a class="layui-btn layui-btn-xs layui-bg-orange" lay-event="verify">待审核</a>`
+            break;
+          case 2 :
+          temStr += `<a class="layui-btn layui-btn-xs layui-bg-orange" lay-event="verify">待审核</a>`
+            break;
+        }
+           return temStr;
+      }
+    }
     ]]
   });
   // 監聽事件
   table.on('tool(test)',function(obj){
     let {data,event} = obj;
-    let {art_id} = data;
+    let {art_id,title,content} = data;
     switch(event){
       case 'del':
         del(art_id)
@@ -93,10 +118,37 @@ layui.use(['element','layer','table'], function(){
         edit(art_id)
         break;
       case 'look':
-        look(art_id)
+        look(title,content)
+        break;
+      case 'verify':
+        verify(art_id)
         break;
     }
   })
+
+  function verify(art_id){
+    layer.confirm('是否通过审核',{
+      btn:['通过','不通过']
+    },function(){
+      passVerification(art_id,1)
+    },function(){
+      passVerification(art_id,2)
+    })
+  }
+  function passVerification(art_id,status){
+    $.ajax({
+      url:'/passverify',
+      data:{art_id,status},
+      type:'post',
+      dataType:'json',
+      success({code,message}){
+        if(code===0){
+          tableUI.reload()
+        }
+        layer.msg(message)
+      }
+    })
+  }
   function del(art_id){
     layer.confirm('確認刪除',{btn:['是的','取消']},function(){
       $.ajax({
@@ -116,8 +168,14 @@ layui.use(['element','layer','table'], function(){
   function edit(art_id){
     location.href = '/editarticle?art_id='+art_id
   }
-  function look(art_id){
-    
+  function look(title,content){
+    layer.open({
+      title:title,
+      type:1,
+      skin: 'layui-layer-rim', 
+      area: ['800px', '640px'], 
+      content: "<div style='padding:10px'>" + content + "</div>"
+    })
   }
   $('#add').on('click',()=>{
     location.href = '/addarticle'
