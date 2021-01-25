@@ -111,8 +111,10 @@ layui.use(['element','form','layer','laydate','upload'], function(){
      ,url: '/upload/' //上传接口
      ,done: function({code,message,path}){
        //上传完毕回调
-     $('#cover-preview').attr('src',path).css('width','100')
+       if(code===0){
+        $('#cover-preview').attr('src',path).css('width','100')
      $('input[name="Cover"]').val(path)
+       }
      }
      ,error: function({code,message,path}){
        //请求异常回调
@@ -127,9 +129,11 @@ layui.use(['element','form','layer','laydate','upload'], function(){
   form.on('submit(formDemo)', function(data){
     console.log(data)    
     let formData = data.field;
+    formData.art_id = art_id;
+    formData.oldCover = oldCover;
   $.ajax({
     type:'post',
-    url:'/addArticle',
+    url:'/editArticle',
     data:formData,
     dataType:'json',
     success({code,message}){
@@ -141,6 +145,7 @@ layui.use(['element','form','layer','laydate','upload'], function(){
   })    
     return false;
   });
+
   ;(function(){
     $.ajax({
       url:'/getcolumn',
@@ -157,7 +162,8 @@ layui.use(['element','form','layer','laydate','upload'], function(){
         getEditArt();
       }
     })
-  })()
+  })();
+let oldCover;
   function getEditArt(){
     $.ajax({
       url:'/getArticleData',
@@ -165,7 +171,8 @@ layui.use(['element','form','layer','laydate','upload'], function(){
       dataType:'json',
       success(res){
         let {title,cat_id,status,content,publish_date,author,Cover} = res;
-        Cover && $('#cover-preview').attr('src',Cover)
+        Cover && $('#cover-preview').attr('src',Cover);
+        oldCover = Cover
         form.val('formDemo',{
           title,cat_id,status,content,publish_date,author
         })
@@ -173,6 +180,7 @@ layui.use(['element','form','layer','laydate','upload'], function(){
     })
   }
 });
+
 </script>
 </body>
 </html>

@@ -57,4 +57,22 @@ let articleController = {}
         let data = await dataquery(sql); // [{}]
         res.json(data[0] || {})
     }
+    articleController.editArticle = async (req,res)=>{
+        let {title,cat_id,status,content,publish_date,author,Cover,oldCover,art_id} = req.body
+        let sql;
+        if(Cover){
+            sql = `update article set title='${title}',cat_id=${cat_id},status=${status},
+            content='${content}',publish_date='${publish_date}',author='${author}',Cover='${Cover}' where art_id=${art_id}`
+        }else{
+            sql = `update article set title='${title}',cat_id=${cat_id},status=${status},
+            content='${content}',publish_date='${publish_date}',author='${author}' where art_id=${art_id}`
+        }
+        let result = await dataquery(sql)
+        if(result.affectedRows){ 
+            Cover && fs.unlinkSync(oldCover)
+            res.json(resJson.success)
+        }else{
+            res.json(resJson.error)
+        }
+    }
     module.exports = articleController

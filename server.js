@@ -3,10 +3,20 @@ const app = express()
 const path = require('path')
 const artTemplate = require('art-template')
 const express_template  = require('express-art-template')
-
+const session = require('express-session')
 let router = require('./router/router')
 
-
+// 初始化session,定义session一些配置
+let options = {
+  name:"SESSIONID", // 待会写入到cookie中标识
+  secret: "FGVH$#E%&", // 用来加密会话，防止篡改。
+  cookie: {
+      httpOnly: true,
+      secure: false, // false-http(默认), true-https
+      maxAge:60000*30, // session在cookies存活30分钟，
+  }
+};
+app.use( session(options) )
 
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded

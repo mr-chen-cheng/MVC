@@ -27,7 +27,7 @@ let resJson = require('../tool/resJson')
     }
     columnController.addColumn = async (req,res)=>{
         let {name,sort,add_date} = req.body
-        console.log(name,sort,add_date)
+        // console.log(name,sort,add_date)
         let sql = `insert into category(name,sort,add_date) values('${name}','${sort}','${add_date}')`
        
            try{
@@ -43,7 +43,7 @@ let resJson = require('../tool/resJson')
     }
     columnController.redactColumn = async (req,res)=>{
         let {cat_id} = req.query
-        console.log(cat_id)
+        // console.log(cat_id)
         if(!cat_id){
             res.json(resJson.busy)
             return
@@ -60,12 +60,12 @@ let resJson = require('../tool/resJson')
     }
     columnController.updataColumn = async (req,res)=>{
         let {name,sort,add_date,cat_id} = req.body
-            console.log(cat_id)
+            // console.log(cat_id)
             let sql = `update category set name='${name}',sort=${sort},add_date='${add_date}' 
             where cat_id = ${cat_id}`
             // try{
             let data = await dataquery(sql)
-            console.log(data)
+            // console.log(data)
             if(data.affectedRows){
                 res.json(resJson.success)
             }else{
@@ -74,9 +74,9 @@ let resJson = require('../tool/resJson')
              
     }
     columnController.artData = async (req,res)=>{
-        console.log(req.query)
+        // console.log(req.query)
         let {page,limit:pagesize} = req.query
-        console.log(page,pagesize)
+        // console.log(page,pagesize)
         let offset = (page-1)*pagesize
         let sql = `select t1.*,t2.name from article t1 left join category t2 on t1.cat_id = t2.cat_id
         order by t1.art_id desc limit ${offset},${pagesize}`;
@@ -92,7 +92,7 @@ let resJson = require('../tool/resJson')
     columnController.getcolumn = async (req,res)=>{
          let sql = `select * from category order by sort desc`
          let result = await dataquery(sql)
-         console.log(result)
+        //  console.log(result)
          if(result){
              res.json(result)
          }else{

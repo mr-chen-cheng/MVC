@@ -7,6 +7,7 @@ const multer = require('multer');
 let upload = multer({ dest: 'uploads/' })
 let columnController = require('../controller/columnController')
 let articleController = require('../controller/articleController')
+let userController = require('../controller/userController')
  router.get(/^\/$|^\/index$/,(req,res)=>{
     res.render('index.html')
 })
@@ -28,6 +29,11 @@ router.get('/editarticle',(req,res)=>{
 router.get('/addarticle',(req,res)=>{
     res.render('add-article.html')
 })
+router.get('/login',(req,res)=>{
+    res.render('login.html')
+})
+router.post('/register',userController.register)
+router.post('/editArticle',articleController.editArticle)
 router.get('/getArticleData',articleController.getArticleData)
 router.post('/upload',upload.single('file'),articleController.upload)
 router.post('/passverify',articleController.passverify)
