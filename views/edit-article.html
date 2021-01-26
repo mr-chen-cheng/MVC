@@ -63,12 +63,7 @@
                 <input type="radio" name="status" value="1" title="发布" >
               </div>
             </div>
-            <div class="layui-form-item layui-form-text">
-              <label class="layui-form-label">内容（富文本）</label>
-              <div class="layui-input-inline">
-                <textarea name="content" placeholder="请输入内容" class="layui-textarea"></textarea>
-              </div>
-            </div>
+            <div id="content"></div>
             <div class="layui-form-item">
               <label class="layui-form-label">发布时间</label>
               <div class="layui-input-inline">
@@ -88,7 +83,7 @@
   {{include './common/footer.html'}}
 </div>
 {{include './common/srcJs.html'}}
-
+<script src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"></script>
 <script>
    // 获取地址栏中的art_id的参数
    let url = location.href;
@@ -96,7 +91,10 @@
   // [...伪数组] =》 转化为真数组
   // [,cat_id]： 解构：舍去第一个参数，要第二个参数
   let [,art_id] = [...reg.exec(url)]
-
+  const E = window.wangEditor
+  const editor = new E('#content')
+  editor.config.uploadImgShowBase64 = true; // 可以实现手动上传图片(转换成base64格式)
+  editor.create()
 //JavaScript代码区域
 layui.use(['element','form','layer','laydate','upload'], function(){
   var element = layui.element;
@@ -131,6 +129,7 @@ layui.use(['element','form','layer','laydate','upload'], function(){
     let formData = data.field;
     formData.art_id = art_id;
     formData.oldCover = oldCover;
+    formData.content = editor.txt.html()
   $.ajax({
     type:'post',
     url:'/editArticle',

@@ -14,19 +14,56 @@
   {{include './common/side.html'}}
   <div class="layui-body">
     <!-- 内容主体区域 -->
-    <div style="padding: 15px;">内容主体区域</div>
+    <div style="padding: 15px;">
+      <div id="cate" style="width: 600px;height: 400px;"></div>
+    </div>
   </div>
   
   {{include './common/footer.html'}}
+  {{include './common/srcJs.html'}}
 </div>
-{{include './common/srcJs.html'}}
-
+<!-- <script scr="/public/js/eachart.js"><script> -->
+  <script src="/public/js/eachart.js"></script>
 <script>
+  
+  $.get('/cateCount',(res)=>{
+    let names = []
+    let totals = []
+    res.map(v=>{
+      names.push(v.name)
+      totals.push(v.total)
+    })
+    initEachart(names,totals)
+  })
+
+  function initEachart(names,totals){
+    let myEchart = echarts.init($("#cate")[0])
+    let option = {
+      title: {
+              text: '文章管理系统统计一览表'
+          },
+          tooltip: {},
+          legend: {
+              data:['销量']
+          },
+          xAxis: {
+              data: names
+          },
+          yAxis: {},
+          series: [{
+              name: '文章数',
+              type: 'bar',
+              data: totals
+          }]
+    }
+    myEchart.setOption(option)
+  }
 //JavaScript代码区域
 layui.use('element', function(){
   var element = layui.element;
-  
 });
+
 </script>
+
 </body>
 </html>

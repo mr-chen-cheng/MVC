@@ -17,7 +17,19 @@ let options = {
   }
 };
 app.use( session(options) )
-
+app.use((req,res,next)=>{
+  let path = req.path.toLowerCase()
+  let release = ['/login','/loginout','register']
+  if(release.includes(path)){
+    next()
+  }else{
+    if(req.session.userInfo){
+      next()
+    }else{
+      next()
+    }
+  }
+})
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 

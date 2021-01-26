@@ -1,7 +1,7 @@
  const express = require('express')
 // 得到一个路由器
 let router = express.Router();
-
+let dataquery = require('../model/model')
 const multer = require('multer');
 // 定义上传的目录
 let upload = multer({ dest: 'uploads/' })
@@ -31,6 +31,16 @@ router.get('/addarticle',(req,res)=>{
 })
 router.get('/login',(req,res)=>{
     res.render('login.html')
+})
+router.get('/loginout',(req,res)=>{
+    req.session.destroy(err=>{if(err) throw err})
+    res.json({message:'操作成功'})
+})
+router.get('/cateCount',async (req,res)=>{
+    let sql = `select count(*) total ,t2.name,t1.cat_id from article t1
+    left join category t2 on t1.cat_id = t2.cat_id group by t1.cat_id`
+    let data = await dataquery(sql)
+    res.json(data)
 })
 router.post('/register',userController.register)
 router.post('/editArticle',articleController.editArticle)
