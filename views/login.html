@@ -11,7 +11,7 @@
     <div class="login-wrap">
         <div class="login-html">
             <input id="tab-1" type="radio" name="tab"  class="sign-in" checked><label for="tab-1" class="tab">登录</label>
-            <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">注册</label>
+            <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab" id="register">注册</label>
             <div class="login-form">
                 <div class="sign-in-htm">
                     <div class="group">
@@ -31,33 +31,16 @@
                     </div>
                     <div class="hr"></div>
                     <div class="foot-lnk">
-                        <a href="#forgot">Forgot Password?</a>
+                        <a href="#forgot">忘记密码?</a>
                     </div>
                 </div>
-                <div class="sign-up-htm">
-                    <div class="group">
-                        <label for="user" class="label">用户名</label>
-                        <input id="user" type="text" class="input">
-                    </div>
-                    <div class="group">
-                        <label for="pass" class="label">密码</label>
-                        <input id="pass" type="password" class="input" data-type="password">
-                    </div>
-                    <div class="group">
-                        <label for="repass" class="label">确认密码</label>
-                        <input id="repass" type="password" class="input" data-type="password">
-                    </div>
-                    
-                    <div class="group">
-                        <input type="submit" class="button" value="注册">
-                    </div>
-                    
-                </div>
+                
             </div>
         </div>
     </div>
 </body>
 {{include './common/srcJs.html'}}
+<script src="/public/js/js-cookies.js"></script>
 <script>
     let layer = layui.layer;
     // ajax登录
@@ -74,21 +57,24 @@
         var index = layer.load(1, {
             shade: [0.5,'#333'] //0.1透明度的白色背景
         });
-
-        $.post('/register',{username,password},(res)=>{
+        console.log('aaaa')
+        $.post('/logined',{username,password},(res)=>{
+            console.log('hhh')
             layer.close(index)
             let {code,message} = res;
+            console.log(res)
             if(code==0){
                 layer.msg(`欢迎：${username}回家`)
-                // 把用户名存储到本地存储，实现跨页面共享数据
-                localStorage.setItem('username',username)
                 location.href = '/'
             }else{
                 layer.msg(message)
             }
-            
         },'json')
-
     })
+    $("#register").on('click',function(){
+        location.href = '/register'
+    })
+
 </script>
+
 </html>

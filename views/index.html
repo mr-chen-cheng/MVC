@@ -5,6 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>layout 后台大布局 - Layui</title>
   {{include './common/linkCss.html'}}
+  <style>
+    #layui-layer1,#layui-layer2{
+      text-align: center;
+    }
+    #layui-layer1 p,#layui-layer2 p{
+      margin: 10px auto;
+    }
+    #layui-layer2 #updatePass{
+      width: 100px;
+      height: 30px;
+      background-color: skyblue;
+      outline: 0;
+      border: 0;
+      color: aliceblue;
+    }
+  </style>
 </head>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
@@ -25,7 +41,15 @@
 <!-- <script scr="/public/js/eachart.js"><script> -->
   <script src="/public/js/eachart.js"></script>
 <script>
-  
+  // function init(){
+  //   $.get('/indexInit',(res)=>{
+  //     console.log(res)
+  //     if(res.code !==0){
+  //       location.href = '/login'
+  //     }
+  //   })
+  // }
+  // init()
   $.get('/cateCount',(res)=>{
     let names = []
     let totals = []

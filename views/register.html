@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        li{
+            list-style: none;
+        }
+        .red {
+            color: red;
+        }
+
+        input,
+        button {
+            outline: 0;
+            border: 0;
+        }
+
+        #formele {
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+            width: 400px;
+            height: 500px;
+            background-color: #ccc;
+            padding: 0 20px;
+            box-sizing: border-box;
+            margin: 0 auto;
+        }
+
+        input {
+            width: 250px;
+            height: 30px;
+        }
+
+        input[type='button'] {
+            width: 300px;
+            background-color: skyblue;
+            color: azure;
+            cursor: pointer;
+        }
+
+        p>span {
+            display: inline-block;
+            width: 80px;
+        }
+
+        p {
+            margin: 10px 0;
+            /* height: 50px; */
+        }
+        li{
+            height: 30px;
+        }
+        #proview{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="formele">
+        <p><span>用户名:</span><input type="text" id="username" name="username"></p>
+        <li id="one"></li>
+        <p><span>密码:</span><input type="password" id="password1" name="password1"></p>
+        <li id="three"></li>
+        <p><span>确认密码:</span><input type="password" id="password2" name="password2"></p>
+        <li id="four"></li>
+        <p><span>头像:</span><input value="选择图片" type="file" id="avatar"  onchange="getPath(this)">
+            <span>预览:</span><img src="" id="proview" alt="">
+        </p>
+        <li id="five"></li>
+        <p><input id="btn" type="button" value="注册"></p>
+    </form>
+</body>
+<script src="/public/js/jquery.js"></script>
+<script>
+    let counter,counter2,counter3;
+    let namelVal;
+    $("#username").blur( function () {
+         namelVal = $(this).val()
+        let reg = /^[A-Za-z0-9]{6,12}$/
+        // console.log(reg.test(namelVal))
+        if (!reg.test(namelVal)) {
+            $("#one").html('用户名格式不正确不能有特殊字符，必须6-12位').addClass('red')
+             counter = false
+        } else if (namelVal === '') {
+            $("#one").html('用户名不能为空').addClass('red')
+             counter = false
+        } else {
+            $.ajax({
+            url:'/postname',
+            data:{namelVal},
+            type:'post',
+            dataType:'json',
+            success:function(res){
+                console.log(res)
+                let {errcode,message}  = res;
+                if(errcode===0){
+                    $("#one").html(message).removeClass('red')
+                     counter = true
+                }else{
+                    $("#one").html(message).addClass('red')
+                     counter = false
+                }
+            }
+        })
+        }
+       
+    });
+
+    let passwordVal1;
+    $("#password1").blur(function () {
+        passwordVal1 = $(this).val()
+        console.log(passwordVal1.length)
+        let len = passwordVal1.length
+        if (passwordVal1 != '' && len > 7) {
+            $("#three").html('').removeClass('red')
+             counter2 = true
+        } else {
+            $("#three").html('密码不能为空，必需满8位').addClass('red')
+             counter2 = false
+        }
+    })
+    $("#password2").blur( function () {
+        let passwordVal2 = $(this).val()
+        if (passwordVal1 != passwordVal2) {
+            $("#four").html('确认密码错误').addClass('red')
+             counter3 = false
+        } else {
+            $("#four").html('').removeClass('red')
+             counter3 = true
+        }
+    })
+    let formele = $("#formele")
+    let imgFile = ''
+    function getPath(ele){
+        let filedata = ele.files[0]
+        console.log(filedata)
+        let formData = new FormData()
+        if(filedata.size !==0){
+            formData.append('avatar2',filedata)
+            console.log(formData)
+            $.ajax({
+            type:'post',
+            url:'/apiavatar',
+            processData:false,
+            contentType:false,
+            data:formData,
+            dataType:'json'
+        }).then(res=>{
+            console.log(res)
+            if(res.path !==''){
+                $("#proview").attr('src',res.path)
+                imgFile = res.path
+            }
+        })
+        }
+    }
+    console.log(imgFile)
+    $('#btn').on('click', function () {
+        let _this = $(this)
+        if (counter  && counter2 && counter3) {
+            let formdata = formele.serialize()
+            formdata += `&avatar=${imgFile}`
+            console.log(formdata)
+            $.ajax({
+                url:'/postregister',
+                data:formdata,
+                dataType:'json',
+                type:'post',
+                beforeSend:function(){
+                    _this.val('loading...').prop('disabled', true)
+                },
+                success:function(res){
+                let {errcode,message} =  res
+                    if(errcode===0){
+                        $("#five").html('')
+                        if(confirm('注册成功，跳转登录页面')){
+                            location.href = '/login'
+                        }
+                    }else{
+                        $("#five").html(message)
+                    }
+                },
+                complete:function(){
+                    _this.val('注册').prop('disabled', false)
+                }
+            })
+        } else {
+            $("#five").html('信息有误').addClass('red')
+            _this.val('注册').prop('disabled', false)
+        }
+    })
+</script>
+
+</html>

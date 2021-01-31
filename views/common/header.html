@@ -2,7 +2,7 @@
     <div class="layui-logo">layui 后台布局</div>
     <!-- 头部区域（可配合layui已有的水平导航） -->
     <ul class="layui-nav layui-layout-left">
-      <li class="layui-nav-item"><a href="">控制台</a></li>
+      <li class="layui-nav-item"><a href="/">首页</a></li>
       <li class="layui-nav-item"><a href="">商品管理</a></li>
       <li class="layui-nav-item"><a href="">用户</a></li>
       <li class="layui-nav-item">
@@ -14,30 +14,108 @@
         </dl>
       </li>
     </ul>
-    <ul class="layui-nav layui-layout-right">
+    <ul class="layui-nav layui-layout-right" id="ulele" style="margin-right: 100px;">
       <li class="layui-nav-item">
         <a href="javascript:;">
-          <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+          <img src="" id="userPortrait" class="layui-nav-img">
           <span id="username">阿达西买买提</span>
         </a>
         <dl class="layui-nav-child">
-          <dd><a href="">基本资料</a></dd>
-          <dd><a href="">安全设置</a></dd>
+          <dd><a href="javascript:;" id="upImg"><span>更换头像</span></a></dd>
+          <dd><a href="javascript:;" id="upPassword">更换密码</a></dd>
+          <dd></dd>
         </dl>
       </li>
-      <li class="layui-nav-item"><a href="" id="loginout">退了</a></li>
+      <li class="layui-nav-item"><a href="" id="loginout">退出登录</a></li>
     </ul>
   </div>
   <script src="/public/js/jquery.js"></script>
   <script src="/public/layui/layui.all.js"></script>
 <script>
   let layer = layui.layer;
-  $('#username').html(localStorage.getItem('username'))
+  let user_id ;
+    
+  function getImg(){
+    $.get('/getImg',(res)=>{
+      console.log(res)
+      $('#username').html(res.username)
+      $('#userPortrait').attr('src',res.avatar)
+      $("#proview").attr('src',res.avatar)
+      user_id = res.user_id
+    },'json')
+  };
+  getImg()
+
+      function getFile(ele){
+        let filedata = ele.files[0]
+        console.log(filedata)
+        let formData = new FormData()
+        if(filedata.size !==0){
+            formData.append('avatar',filedata)
+            console.log(formData)
+            $.ajax({
+            type:'post',
+            url:'/upAvatar',
+            processData:false,
+            contentType:false,
+            data:formData,
+            dataType:'json'
+        }).then(res=>{
+            console.log(res)
+            if(res.path !==''){
+                $("#proview").attr('src',res.path)
+                $('#userPortrait').attr('src',res.path)
+                layer.msg(res.message)
+                setTimeout(function(){
+                  layer.closeAll()
+                },500)
+                getImg()
+            }
+        })
+        }
+    }
+ 
   $('#loginout').on('click',function(){
     $.get('/loginout',(res)=>{
-      localStorage.clear()
       layer.msg(res.message)
       location.href = '/login'
     })
   })
+
+  $("#ulele").on('click','#upImg',function(){
+    console.log('hhhh')
+    layer.open({
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['420px', '240px'], //宽高
+        content: `<p>更换头像：<input value="选择图片" type="file" id="avatar" name="avatar" onchange="getFile(this)"></p>
+          <p><span>预览:</span><img src="" id="proview" style="width: 150px;"></p>`
+      });
+    })
+    $("#ulele").on('click','#upPassword',function(){
+      layer.open({
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['420px', '240px'], //宽高
+        content: `<p>请输入新密码：<input id="repassword" type="password" placeholder="新密码"></p>
+          <p><input type="button" id="updatePass" value="更换"></p>`
+      });
+      
+    })
+    $(document).on('click','#updatePass',function(){
+      console.log('hhhhh')
+      let repassword = $("#repassword").val()
+      if(repassword ===''){
+        layer.msg('密码为空')
+        return
+      }
+      console.log(user_id,repassword)
+      $.post('/upPassword',{repassword,user_id},(res)=>{
+          layer.msg(res.message)
+          setTimeout(function(){
+            layer.closeAll()
+          },500)
+          
+        },'json')
+    })
 </script>

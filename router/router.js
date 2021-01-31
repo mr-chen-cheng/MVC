@@ -33,8 +33,12 @@ router.get('/login',(req,res)=>{
     res.render('login.html')
 })
 router.get('/loginout',(req,res)=>{
-    req.session.destroy(err=>{if(err) throw err})
-    res.json({message:'操作成功'})
+     //删除整个session会话
+  req.session.destroy()
+//   res.json()
+  
+//   req.session.userInfo = null
+  res.json({message:'操作成功'})
 })
 router.get('/cateCount',async (req,res)=>{
     let sql = `select count(*) total ,t2.name,t1.cat_id from article t1
@@ -42,7 +46,21 @@ router.get('/cateCount',async (req,res)=>{
     let data = await dataquery(sql)
     res.json(data)
 })
-router.post('/register',userController.register)
+router.get('/register',(req,res)=>{
+    res.render('register.html')
+})
+router.get('/getImg',(req,res)=>{
+     let data = req.session.userInfo
+    //  console.log(data)
+     res.json(data)
+})
+router.get('/indexInit',userController.indexInit)
+router.post('/upPassword',userController.upPassword)
+router.post('/upAvatar',upload.single('avatar'),userController.upAvatar)
+router.post('/postRegister',userController.postRegister)
+router.post('/apiavatar',upload.single('avatar2'),userController.apiAvatar)
+router.post('/postname',userController.postname)
+router.post('/logined',userController.logined)
 router.post('/editArticle',articleController.editArticle)
 router.get('/getArticleData',articleController.getArticleData)
 router.post('/upload',upload.single('file'),articleController.upload)
