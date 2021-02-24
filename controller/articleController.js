@@ -18,6 +18,7 @@ let articleController = {}
         let sql =  `insert into article(title,content,cat_id,status,publish_date,author,Cover)
         values('${title}','${content}',${cat_id},${status},'${publish_date}','${author}','${Cover}')`
         let result = await dataquery(sql)
+        console.log(result)
         if(result.affectedRows){
             res.json(resJson.success)
         }else{

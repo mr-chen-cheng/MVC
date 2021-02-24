@@ -38,18 +38,10 @@
   {{include './common/footer.html'}}
   {{include './common/srcJs.html'}}
 </div>
-<!-- <script scr="/public/js/eachart.js"><script> -->
   <script src="/public/js/eachart.js"></script>
 <script>
-  // function init(){
-  //   $.get('/indexInit',(res)=>{
-  //     console.log(res)
-  //     if(res.code !==0){
-  //       location.href = '/login'
-  //     }
-  //   })
-  // }
-  // init()
+
+
   $.get('/cateCount',(res)=>{
     let names = []
     let totals = []
@@ -82,10 +74,6 @@
     }
     myEchart.setOption(option)
   }
-//JavaScript代码区域
-layui.use('element', function(){
-  var element = layui.element;
-});
 
 </script>
 

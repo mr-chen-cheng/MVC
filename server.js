@@ -5,6 +5,12 @@ const artTemplate = require('art-template')
 const express_template  = require('express-art-template')
 const session = require('express-session')
 let router = require('./router/router')
+let apiRouter = require('./router/apiRouter')
+// 跨域
+let cors = require('cors')
+app.use(cors())
+// api 接口
+app.use('/api',apiRouter) 
 var cookieParser = require('cookie-parser')
     app.use(cookieParser())
 // 初始化session,定义session一些配置
@@ -41,5 +47,5 @@ app.use((req,res,next)=>{
   }
 })
   app.use(router)
-    
+
 app.listen(5433,()=>console.log('标号5433'))

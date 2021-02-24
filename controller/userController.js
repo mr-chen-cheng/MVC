@@ -108,7 +108,7 @@ let {secret} = require('../config/salt.json')
         }
         userController.indexInit =  (req,res)=>{
             let data = req.session
-            console.log(data.userInfo)
+            // console.log(data.userInfo)
             if(data.userInfo!==undefined){
                 res.json(resJson.success)
             }else{
